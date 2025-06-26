@@ -61,3 +61,30 @@ SELECT dm.nama_mk, fam.jumlah_nilai_A, fam.jumlah_nilai_AB, fam.jumlah_nilai_B, 
 
 -- 21. Distribusi Nilai (A, AB, B, dst.) per Mata Kuliah (Sistem Basis Data)
 SELECT dm.nama_mk, fam.jumlah_nilai_A, fam.jumlah_nilai_AB, fam.jumlah_nilai_B, fam.jumlah_nilai_BC, fam.jumlah_nilai_C, fam.jumlah_nilai_D, fam.jumlah_nilai_E, dw.tahun, dw.semester FROM Fact_Analisis_MataKuliah fam JOIN Dim_MataKuliah dm ON fam.id_mk = dm.id_mk JOIN Dim_Waktu dw ON fam.id_waktu = dw.id_waktu WHERE dm.nama_mk = 'Sistem Basis Data' ORDER BY dw.tahun DESC, dw.semester DESC;
+
+-- 22 . Mahasiswa dengan IPK Kumulatif di atas rata-rata
+SELECT NRP, nama_mahasiswa, ipk_kumulatif FROM Dim_Mahasiswa WHERE ipk_kumulatif > (SELECT AVG(ipk_kumulatif) FROM Dim_Mahasiswa);
+
+-- 23 . 10 Mata Kuliah dengan SKS Terbesar
+SELECT kode_mk, nama_mk, sks_mk FROM Dim_MataKuliah ORDER BY sks_mk DESC LIMIT 10;
+
+-- 24. Jumlah Mahasiswa yang Mengambil Mata Kuliah "Persiapan" vs. "Sarjana"
+SELECT dm.tahap_mk, COUNT(DISTINCT ft.id_mahasiswa) AS jumlah_mahasiswa FROM Fact_Transkrip ft JOIN Dim_MataKuliah dm ON ft.id_mk = dm.id_mk GROUP BY dm.tahap_mk;
+
+-- 25. 5 Mahasiswa dengan IPK Sarjana Terendah (Di antara yang Berstatus Normal/Aktif)
+SELECT NRP, nama_mahasiswa, ip_sarjana FROM Dim_Mahasiswa WHERE status_mahasiswa = 'Normal/Aktif' ORDER BY ip_sarjana ASC LIMIT 5;
+
+-- 26 . Semester dengan Rata-rata IPK Tertinggi
+SELECT dw.tahun, dw.semester, AVG(fps.ips) AS rata_rata_ips_semester FROM Fact_Prestasi_Semester fps JOIN Dim_Waktu dw ON fps.id_waktu = dw.id_waktu GROUP BY dw.tahun, dw.semester ORDER BY rata_rata_ips_semester DESC;
+
+-- 27 . Mata Kuliah dengan Jumlah Mahasiswa Tidak Lulus Terbanyak per Semester
+SELECT dm.nama_mk, dw.tahun, dw.semester, fk.jml_mahasiswa_tidak_lulus FROM Fact_Kelulusan fk JOIN Dim_MataKuliah dm ON fk.id_mk = dm.id_mk JOIN Dim_Waktu dw ON fk.id_waktu = dw.id_waktu ORDER BY fk.jml_mahasiswa_tidak_lulus DESC;
+
+-- 28 . Rata-rata SKS Diambil per Semester oleh Mahasiswa Aktif
+SELECT dw.tahun, dw.semester, AVG(fps.sks_diambil_semester) AS rata_rata_sks_diambil FROM Fact_Prestasi_Semester fps JOIN Dim_Waktu dw ON fps.id_waktu = dw.id_waktu JOIN Dim_Mahasiswa dm ON fps.id_mahasiswa = dm.id_mahasiswa WHERE dm.status_mahasiswa = 'Normal/Aktif' GROUP BY dw.tahun, dw.semester ORDER BY dw.tahun ASC, dw.semester ASC;
+
+-- 29 . Jumlah Mahasiswa Baru per Tahun (Berdasarkan NRP unik dan tahun awal tercatat)
+SELECT SUBSTRING(NRP, 5, 2) AS tahun_angkatan, COUNT(DISTINCT id_mahasiswa) AS jumlah_mahasiswa FROM Dim_Mahasiswa GROUP BY tahun_angkatan ORDER BY tahun_angkatan ASC;
+
+-- 30 . Mata Kuliah dengan Rentang Bobot Nilai (Min-Max) Terbesar
+SELECT dm.nama_mk, MIN(dn.bobot_nilai) AS min_bobot_nilai, MAX(dn.bobot_nilai) AS max_bobot_nilai, (MAX(dn.bobot_nilai) - MIN(dn.bobot_nilai)) AS rentang_bobot_nilai FROM Fact_Transkrip ft JOIN Dim_MataKuliah dm ON ft.id_mk = dm.id_mk JOIN Dim_Nilai dn ON ft.id_nilai = dn.id_nilai GROUP BY dm.nama_mk ORDER BY rentang_bobot_nilai DESC;
