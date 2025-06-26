@@ -86,5 +86,5 @@ SELECT dw.tahun, dw.semester, AVG(fps.sks_diambil_semester) AS rata_rata_sks_dia
 -- 29 . Jumlah Mahasiswa Baru per Tahun (Berdasarkan NRP unik dan tahun awal tercatat)
 SELECT SUBSTRING(NRP, 5, 2) AS tahun_angkatan, COUNT(DISTINCT id_mahasiswa) AS jumlah_mahasiswa FROM Dim_Mahasiswa GROUP BY tahun_angkatan ORDER BY tahun_angkatan ASC;
 
--- 30 . Mata Kuliah dengan Rentang Bobot Nilai (Min-Max) Terbesar
-SELECT dm.nama_mk, MIN(dn.bobot_nilai) AS min_bobot_nilai, MAX(dn.bobot_nilai) AS max_bobot_nilai, (MAX(dn.bobot_nilai) - MIN(dn.bobot_nilai)) AS rentang_bobot_nilai FROM Fact_Transkrip ft JOIN Dim_MataKuliah dm ON ft.id_mk = dm.id_mk JOIN Dim_Nilai dn ON ft.id_nilai = dn.id_nilai GROUP BY dm.nama_mk ORDER BY rentang_bobot_nilai DESC;
+-- 30 . Mata Kuliah dengan Variasi Nilai Terbanyak
+SELECT dm.nama_mk, COUNT(DISTINCT dn.huruf_nilai) AS jumlah_variasi_nilai FROM Fact_Transkrip ft JOIN Dim_MataKuliah dm ON ft.id_mk = dm.id_mk JOIN Dim_Nilai dn ON ft.id_nilai = dn.id_nilai GROUP BY dm.nama_mk ORDER BY jumlah_variasi_nilai DESC;
