@@ -30,12 +30,6 @@ A Python-based ETL pipeline to extract academic transcript data from PDFs, trans
   * `mysql-connector-python`
   * `PyPDF2`
 
-Install all dependencies with:
-
-```bash
-pip install -r requirements.txt
-```
-
 ---
 
 ## Star Schema Structure
